@@ -45,7 +45,12 @@ class MateriasViewModel : ViewModel() {
         descripcionUs = descripcion
     }
 
+
     fun nuevaTarea() {
+
+        if (tituloUs.isBlank()) {
+            return
+        }
 
         val nuevaTarea = Tarea(
             tituloUs,
@@ -58,9 +63,14 @@ class MateriasViewModel : ViewModel() {
             val listaTareas = estadoActual.tareas.toMutableList()
             listaTareas.add(nuevaTarea)
             estadoActual.copy(
-                tareas = listaTareas
+                tareas = estadoActual.tareas + nuevaTarea
             )
         }
+
+        tituloUs = ""
+        descripcionUs = ""
+        tipoModulo = ""
+        urgencia = false
 
     }
 
