@@ -31,39 +31,68 @@ class MateriasViewModel : ViewModel() {
 
     fun actualizarEleccionUrgencia(urgente: Boolean) {
         urgencia = urgente
+
+        val tareaViewModel = _uiState.value.tareaUIState.copy()
+        tareaViewModel.esUrgente = urgencia
+
+        _uiState.update { estadoActual ->
+            estadoActual.copy (
+                tareaUIState = tareaViewModel
+            )
+        }
     }
 
     fun actualizarModulo(modulos: String) {
         tipoModulo = modulos
+
+        val tareaViewModel = _uiState.value.tareaUIState.copy()
+        tareaViewModel.modulos = tipoModulo
+
+        _uiState.update { estadoActual ->
+            estadoActual.copy (
+                tareaUIState = tareaViewModel
+            )
+        }
     }
 
     fun actualizarTitulo(titulo: String) {
         tituloUs = titulo
+
+        val tareaViewModel = _uiState.value.tareaUIState.copy()
+        tareaViewModel.tituloTarea = tituloUs
+
+        _uiState.update { estadoActual ->
+            estadoActual.copy (
+                tareaUIState = tareaViewModel
+            )
+        }
+
     }
 
     fun actualizarDescripcion(descripcion: String) {
         descripcionUs = descripcion
+
+        val tareaViewModel = _uiState.value.tareaUIState.copy()
+        tareaViewModel.descripcion = descripcionUs
+
+        _uiState.update { estadoActual ->
+            estadoActual.copy (
+                tareaUIState = tareaViewModel
+            )
+        }
     }
 
 
     fun nuevaTarea() {
 
-        if (tituloUs.isBlank()) {
+        if (tituloUs.isBlank() || descripcionUs.isBlank() || tipoModulo.isBlank()) {
             return
         }
 
-        val nuevaTarea = Tarea(
-            tituloUs,
-            descripcionUs,
-            tipoModulo,
-            urgencia
-        )
-
         _uiState.update { estadoActual ->
-            val listaTareas = estadoActual.tareas.toMutableList()
-            listaTareas.add(nuevaTarea)
             estadoActual.copy(
-                tareas = estadoActual.tareas + nuevaTarea
+                tareaUIState = Tarea(),
+                tareas = estadoActual.tareas + estadoActual.tareaUIState
             )
         }
 
@@ -71,7 +100,6 @@ class MateriasViewModel : ViewModel() {
         descripcionUs = ""
         tipoModulo = ""
         urgencia = false
-
     }
 
 }

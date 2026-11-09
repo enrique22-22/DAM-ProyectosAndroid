@@ -2,5 +2,5 @@ package com.example.practica2_kotlin.modelo
 
 data class MateriasUIState (
     val tareas: List<Tarea> = listOf(),
-    val tarea: Tarea = Tarea()
+    val tareaUIState: Tarea = Tarea()
 )

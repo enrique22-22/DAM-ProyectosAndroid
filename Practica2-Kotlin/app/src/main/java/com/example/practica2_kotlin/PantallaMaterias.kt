@@ -23,8 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +43,8 @@ fun PantallaModulos(
 ) {
     val uiState by materiasViewModel.uiState.collectAsState()
 
+    val focusRequester = remember { FocusRequester() }
+
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,15 +58,15 @@ fun PantallaModulos(
         )
 
         OutlinedTextField(
-            value = materiasViewModel.tituloUs,
+            value = uiState.tareaUIState.tituloTarea,
             onValueChange = { nuevoTexto -> materiasViewModel.actualizarTitulo(nuevoTexto) },
             label = { Text("Título de la tarea") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
             singleLine = true
         )
 
         OutlinedTextField(
-            value = materiasViewModel.descripcionUs,
+            value = uiState.tareaUIState.descripcion,
             onValueChange = { nuevaDescripcion -> materiasViewModel.actualizarDescripcion(nuevaDescripcion) },
             label = { Text("Descripción") },
             modifier = Modifier.fillMaxWidth()
@@ -79,17 +84,17 @@ fun PantallaModulos(
         ) {
 
             FilterChip(
-                selected = (materiasViewModel.tipoModulo == "AD"),
+                selected = (uiState.tareaUIState.modulos == "AD"),
                 onClick = { materiasViewModel.actualizarModulo("AD") },
                 label = { Text("AD") }
             )
             FilterChip(
-                selected = (materiasViewModel.tipoModulo == "DI"),
+                selected = (uiState.tareaUIState.modulos  == "DI"),
                 onClick = { materiasViewModel.actualizarModulo("DI") },
                 label = { Text("DI") }
             )
             FilterChip(
-                selected = (materiasViewModel.tipoModulo == "PMDM"),
+                selected = (uiState.tareaUIState.modulos  == "PMDM"),
                 onClick = { materiasViewModel.actualizarModulo("PMDM") },
                 label = { Text("PMDM") }
             )
@@ -106,7 +111,7 @@ fun PantallaModulos(
             )
 
             Checkbox(
-                checked = materiasViewModel.urgencia,
+                checked = uiState.tareaUIState.esUrgente,
                 onCheckedChange = { estaMarcado ->
                     materiasViewModel.actualizarEleccionUrgencia(estaMarcado)
                 }
@@ -114,7 +119,9 @@ fun PantallaModulos(
         }
 
         Button(
-            onClick = { materiasViewModel.nuevaTarea() },
+            onClick = {
+                materiasViewModel.nuevaTarea()
+                focusRequester.requestFocus()},
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Añadir Tarea")
