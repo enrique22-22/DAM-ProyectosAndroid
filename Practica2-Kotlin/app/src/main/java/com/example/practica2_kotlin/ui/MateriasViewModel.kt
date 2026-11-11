@@ -89,12 +89,22 @@ class MateriasViewModel : ViewModel() {
             return
         }
 
-        _uiState.update { estadoActual ->
-            estadoActual.copy(
-                tareaUIState = Tarea(),
-                tareas = estadoActual.tareas + estadoActual.tareaUIState
-            )
-        }
+
+            _uiState.update { estadoActual ->
+
+                if(urgencia) {
+                    estadoActual.copy(
+                        tareaUIState = Tarea(),
+                        tareasUrgentes = estadoActual.tareasUrgentes + estadoActual.tareaUIState
+                    )
+                } else {
+                    estadoActual.copy(
+                        tareaUIState = Tarea(),
+                        tareas = estadoActual.tareas + estadoActual.tareaUIState
+                    )
+                }
+
+            }
 
         tituloUs = ""
         descripcionUs = ""

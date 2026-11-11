@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.colorResource
@@ -140,16 +141,32 @@ fun PantallaModulos(
             modifier = Modifier.align(Alignment.Start)
         )
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            items(uiState.tareas) { tarea ->
-                ItemTarea(tarea = tarea)
+
+              LazyColumn(
+                  modifier = Modifier.weight(0.5F),
+              ) {
+                  items(uiState.tareas) { tarea ->
+                      ItemTarea(tarea = tarea)
+                  }
+              }
+
+            LazyColumn(
+                modifier = Modifier.weight(0.5F),
+            ) {
+
+                items(uiState.tareasUrgentes) { tarea ->
+                    ItemTarea(tarea = tarea)
+                }
             }
         }
+
     }
 }
+
 
 @Composable
 fun ItemTarea(tarea: Tarea) {
