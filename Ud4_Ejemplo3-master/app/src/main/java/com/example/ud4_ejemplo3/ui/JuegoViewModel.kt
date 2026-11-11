@@ -63,7 +63,6 @@ class JuegoViewModel : ViewModel(){
 
             val guiones = palabraOculta.toCharArray()
 
-            // Reemplaza las ocurrencias de la letra en la posición correspondiente
             for (i in palabraActual.indices) {
                 if (palabraActual[i] == letraUsuario[0]) {
                     guiones[i] = letraUsuario[0]

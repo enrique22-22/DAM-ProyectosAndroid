@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="etiqueta">Name</string>
+    <string name="numeroUsuario">Number</string>
+</resources>
