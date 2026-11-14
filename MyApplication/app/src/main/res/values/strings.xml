@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="nombre">Pepe</string>
+    <string name="etiqueta">Nombre</string>
+    <string name="numeroUsuario">Numero</string>
+    <string name="boton">Pulsa</string>
+    <string name="usuario1">Enrique</string>
+    <string name="usuario2">Samuel</string>
+    <string name="usuario3">Alejandro</string>
+    <string name="usuario4">Juan</string>
+    <string name="usuario5">Angel</string>
+    <string name="usuario6">Samuel</string>
+    <string name="usuario7">Enrique</string>
+    <string name="usuario8">Alejandro</string>
+    <string name="abrir">abrir</string>
+    <string name="cerrar">cerrar</string>
+    <string name="Usuario">Usuario</string>
+
+</resources>

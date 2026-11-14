@@ -1,8 +1,8 @@
 package com.example.practica2_kotlin.modelo
 
 data class Tarea (
-    val tituloTarea: String = "",
-    val descripcion: String = "",
-    val modulos: String = "",
-    val esUrgente: Boolean = false
+    var tituloTarea: String = "",
+    var descripcion: String = "",
+    var modulos: String = "",
+    var esUrgente: Boolean = false
 )

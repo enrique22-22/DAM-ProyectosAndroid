@@ -66,11 +66,11 @@ class MateriasViewModel : ViewModel() {
                 tareas = estadoActual.tareas + nuevaTarea
             )
         }
+
         tituloUs = ""
         descripcionUs = ""
         tipoModulo = ""
         urgencia = false
-
 
     }
 
