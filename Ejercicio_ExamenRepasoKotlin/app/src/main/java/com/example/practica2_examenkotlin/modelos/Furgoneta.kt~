@@ -1,0 +1,9 @@
+package com.example.practica2_examenkotlin.modelos
+
+data class Furgoneta (
+    val matricula: String,
+    val esRefrigerada: Boolean,
+    val precioBase: Double
+) : Vehiculo (
+    "Furgoneta"
+)

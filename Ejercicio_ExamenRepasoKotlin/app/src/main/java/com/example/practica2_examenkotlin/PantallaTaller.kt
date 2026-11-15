@@ -1,0 +1,433 @@
+package com.example.practica2_examenkotlin
+
+import android.os.Build
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.practica2_examenkotlin.modelos.Coche
+import com.example.practica2_examenkotlin.modelos.Furgoneta
+import com.example.practica2_examenkotlin.modelos.Moto
+import com.example.practica2_examenkotlin.modelos.OrdenReparacion
+import com.example.practica2_examenkotlin.ui.TallerViewModel
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun PantallaTaller(
+    modifier: Modifier = Modifier,
+    tallerViewModel: TallerViewModel = viewModel()
+) {
+    val uiState by tallerViewModel.uiState.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = "TALLER DAM",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(R.color.teal_700)
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { tallerViewModel.seleccionarVehiculo("Coche") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icons8_car_100),
+                        contentDescription = "Coche",
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Text(text = "COCHE", fontWeight = FontWeight.Bold)
+                    RadioButton(
+                        selected = uiState.vehiculoSeleccionado == "Coche",
+                        onClick = { tallerViewModel.seleccionarVehiculo("Coche") }
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { tallerViewModel.seleccionarVehiculo("Moto") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icons8_moto_94),
+                        contentDescription = "Moto",
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Text(text = "MOTO", fontWeight = FontWeight.Bold)
+                    RadioButton(
+                        selected = uiState.vehiculoSeleccionado == "Moto",
+                        onClick = { tallerViewModel.seleccionarVehiculo("Moto") }
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { tallerViewModel.seleccionarVehiculo("Furgoneta") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icons8_van_60),
+                        contentDescription = "Furgoneta",
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Text(text = "FURGONETA", fontWeight = FontWeight.Bold)
+                    RadioButton(
+                        selected = uiState.vehiculoSeleccionado == "Furgoneta",
+                        onClick = { tallerViewModel.seleccionarVehiculo("Furgoneta") }
+                    )
+                }
+            }
+        }
+
+        OutlinedTextField(
+
+            value = uiState.tipoMatricula,
+            onValueChange = { tallerViewModel.actualizarTipoMatricula(it) },
+            label = { Text("Matrícula (ej. 1234ABC)") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = if (uiState.matriculaIncorrecta) Color.Red else MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = if (uiState.matriculaIncorrecta) Color.Red else MaterialTheme.colorScheme.onSurface
+            ),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        if (uiState.vehiculoSeleccionado == "Coche") {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Motor:", fontWeight = FontWeight.Bold)
+                FilterChip(
+                    selected = uiState.tipoMotor == "Gasolina",
+                    onClick = { tallerViewModel.actualizarTipoMotor("Gasolina") },
+                    label = { Text("Gasolina") }
+                )
+                FilterChip(
+                    selected = uiState.tipoMotor == "Diésel",
+                    onClick = { tallerViewModel.actualizarTipoMotor("Diésel") },
+                    label = { Text("Diésel") }
+                )
+                FilterChip(
+                    selected = uiState.tipoMotor == "Eléctrico",
+                    onClick = { tallerViewModel.actualizarTipoMotor("Eléctrico") },
+                    label = { Text("Eléctrico") }
+                )
+            }
+        } else if (uiState.vehiculoSeleccionado == "Moto") {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(text = "Cilindrada:", fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = uiState.tipoCilindrada == "125cc",
+                        onCheckedChange = { if (it) tallerViewModel.actualizartipoCilindrada("125cc") }
+                    )
+                    Text(text = "125cc")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = uiState.tipoCilindrada == "500cc",
+                        onCheckedChange = { if (it) tallerViewModel.actualizartipoCilindrada("500cc") }
+                    )
+                    Text(text = "500cc")
+                }
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(text = "¿Es refrigerada?", fontWeight = FontWeight.Bold)
+                Switch(
+                    checked = uiState.tipoEsRefrigerada,
+                    onCheckedChange = { tallerViewModel.actualizarTipoEsRefrigerada(it) }
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = uiState.horasManoObra,
+                onValueChange = { tallerViewModel.actualizarManoDeObra(it) },
+                label = { Text("Horas estimadas") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+
+            OutlinedTextField(
+                value = tallerViewModel.fecha,
+                onValueChange = {},
+                enabled = false,
+                label = { Text("Fecha entrada") },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "¿Reparación urgente? (+20 €)",
+                fontWeight = FontWeight.Bold
+            )
+            Checkbox(
+                checked = uiState.tipoUrgenciaReparacion,
+                onCheckedChange = { tallerViewModel.actualizarUrgencia(it) }
+            )
+        }
+
+        Text(
+            text = "Tarifa actual: ${uiState.precioHora} €/hora",
+            fontWeight = FontWeight.Medium
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Button(onClick = { tallerViewModel.registrarOrden() }) {
+                Text(text = "Registrar Orden")
+            }
+            Button(onClick = { tallerViewModel.limpiarFormulario() }) {
+                Text(text = "Cancelar")
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+        Text(
+            text = "Presupuesto Total: ${uiState.totalCarrito} €",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Column(modifier = Modifier.weight(0.5f)) {
+                Text(
+                    text = "Urgentes",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.ordenUrgentes) { orden ->
+                        ItemOrden(orden = orden)
+                    }
+                }
+            }
+
+            Column(modifier = Modifier.weight(0.5f)) {
+                Text(
+                    text = "Normales",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.ordenNormales) { orden ->
+                        ItemOrden(orden = orden)
+                    }
+                }
+            }
+
+            if (uiState.mostrarAlertaError) {
+                AlertDialog(
+                    onDismissRequest = { tallerViewModel.cerrarAlertaError() },
+                    title = {
+                        Text(
+                            text = "Datos incorrectos",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    text = {
+                        Text(text = uiState.mensajeError)
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { tallerViewModel.cerrarAlertaError() }) {
+                            Text(text = "Entendido")
+                        }
+                    }
+                )
+            }
+
+            if (uiState.mostrarAlertaExito) {
+                AlertDialog(
+                    onDismissRequest = { tallerViewModel.cerrarAlertaExito() },
+                    title = {
+                        Text(
+                            text = "Orden registrada",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text(text = "La orden de reparación se ha añadido correctamente a la lista.")
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { tallerViewModel.cerrarAlertaExito() }) {
+                            Text(text = "Aceptar")
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemOrden(orden: OrdenReparacion) {
+    var abierto by remember { mutableStateOf(false) }
+
+    val colorTarjeta = if (orden.esUrgente) {
+        MaterialTheme.colorScheme.errorContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = colorTarjeta)
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    val matricula = when (val v = orden.vehiculo) {
+                        is Coche -> v.matricula
+                        is Moto -> v.matricula
+                        is Furgoneta -> v.matricula
+                        else -> ""
+                    }
+
+                    Text(
+                        text = orden.vehiculo.tipoVehiculo,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                    Text(
+                        text = "Mat: $matricula",
+                        fontSize = 13.sp
+                    )
+                }
+
+                IconButton(onClick = { abierto = !abierto }) {
+                    Icon(
+                        painter = if (abierto) {
+                            painterResource(R.drawable.ic_launcher_background)
+                        } else {
+                            painterResource(R.drawable.ic_launcher_foreground)
+                        },
+                        contentDescription = if (abierto) "Cerrar" else "Abrir"
+                    )
+                }
+            }
+
+            if (abierto) {
+                Spacer(modifier = Modifier.height(6.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(6.dp))
+
+                val detalleVehiculo = when (val v = orden.vehiculo) {
+                    is Coche -> "Motor: ${v.tipoMotor} (${v.precioBase} €/h)"
+                    is Moto -> "Cilindrada: ${v.cilindrada} (${v.precioBase} €/h)"
+                    is Furgoneta -> {
+                        val refri = if (v.esRefrigerada) "Refrigerada" else "Normal"
+                        "Tipo: $refri (${v.precioBase} €/h)"
+                    }
+                    else -> ""
+                }
+
+                Text(text = detalleVehiculo, fontSize = 13.sp)
+                Text(text = "Horas: ${orden.horasManoObra} h", fontSize = 13.sp)
+                Text(text = "Entrada: ${orden.fechaEntrada}", fontSize = 12.sp)
+            }
+        }
+    }
+}

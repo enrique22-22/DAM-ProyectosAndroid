@@ -93,7 +93,6 @@ class CineViewModel : ViewModel() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun agregarPedido() {
         val cant = cantidad.toIntOrNull()
         if (cant == null || cant <= 0) return
