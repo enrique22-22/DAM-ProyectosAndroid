@@ -17,19 +17,24 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -145,21 +150,34 @@ fun PantallaModulos(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
+            Column(modifier = Modifier.weight(0.5F)) {
+                Text(
+                    text = "Urgentes",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.tareasUrgentes) { tarea ->
+                        ItemTarea(tarea = tarea)
+                    }
+                }
+            }
 
-              LazyColumn(
-                  modifier = Modifier.weight(0.5F),
-              ) {
-                  items(uiState.tareas) { tarea ->
-                      ItemTarea(tarea = tarea)
-                  }
-              }
-
-            LazyColumn(
-                modifier = Modifier.weight(0.5F),
-            ) {
-
-                items(uiState.tareasUrgentes) { tarea ->
-                    ItemTarea(tarea = tarea)
+            Column(modifier = Modifier.weight(0.5F)) {
+                Text(
+                    text = "No Urgentes",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.tareas) { tarea ->
+                        ItemTarea(tarea = tarea)
+                    }
                 }
             }
         }
@@ -170,6 +188,9 @@ fun PantallaModulos(
 
 @Composable
 fun ItemTarea(tarea: Tarea) {
+
+    var abierto by remember { mutableStateOf(false) }
+
     val colorTarjeta = if (tarea.esUrgente) {
         MaterialTheme.colorScheme.errorContainer
     } else {
@@ -183,35 +204,75 @@ fun ItemTarea(tarea: Tarea) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            Column(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Título: ${tarea.tituloTarea}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = "Modulo elegido: ${tarea.modulos}",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(text = "Descripción: ${tarea.descripcion}")
-
-                if (tarea.esUrgente) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = "Tarea Urgente",
-                        color = MaterialTheme.colorScheme.error,
+                        text = tarea.tituloTarea,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
+                        fontSize = 16.sp
                     )
+                    Text(
+                        text = "Módulo: ${tarea.modulos}",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 14.sp
+                    )
+                    if (tarea.esUrgente) {
+                        Text(
+                            text = "Tarea Urgente",
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
+
+                BotonDesplegarTarea(
+                    abierto = abierto,
+                    onClick = { abierto = !abierto }
+                )
             }
 
+            if (abierto) {
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Descripción:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
+                Text(
+                    text = tarea.descripcion.ifBlank { "Sin descripción" },
+                    fontSize = 14.sp
+                )
+            }
         }
+    }
+}
+@Composable
+private fun BotonDesplegarTarea(
+    abierto: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = if (abierto) {
+                painterResource(R.drawable.ic_launcher_foreground)
+            } else {
+                painterResource(R.drawable.ic_launcher_foreground)
+            },
+            contentDescription = if (abierto) "Cerrar descripción" else "Abrir descripción"
+        )
     }
 }

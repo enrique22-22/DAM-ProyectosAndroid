@@ -1,9 +1,12 @@
 package com.example.practica_examen_enrique.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.practica_examen_enrique.modelos.Bebida
 import com.example.practica_examen_enrique.modelos.CineUIState
 import com.example.practica_examen_enrique.modelos.Entrada
 import com.example.practica_examen_enrique.modelos.Pedido
@@ -13,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class CineViewModel : ViewModel() {
     private  val _uiState = MutableStateFlow(CineUIState())
@@ -24,13 +29,13 @@ class CineViewModel : ViewModel() {
 
     var tipoPelicula by mutableStateOf("Avengers")
         private set
-
-    var TipoPrecio by mutableStateOf("")
+    var saborBebida by mutableStateOf("Cola")
         private set
-
     var tipoButaca by mutableStateOf("Normal")
         private set
 
+    var conHielo by mutableStateOf(false)
+        private set
     var tamanyoSnack by mutableStateOf("Pequeño")
         private set
 
@@ -39,7 +44,8 @@ class CineViewModel : ViewModel() {
 
     var totalCarrito by mutableStateOf(0.0)
         private set
-    val fecha: String = "2026-10-27"
+    @RequiresApi(Build.VERSION_CODES.O)
+    val fecha: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
     fun seleccionarProducto(producto: String) {
         productoSeleccionado = producto
@@ -47,10 +53,6 @@ class CineViewModel : ViewModel() {
 
     fun actualizarTipoPelicula(pelicula: String) {
         tipoPelicula = pelicula
-    }
-
-    fun actualizarPrecio(precio: String) {
-        TipoPrecio = precio
     }
 
     fun actualizarTipoButaca(butaca: String) {
@@ -61,16 +63,24 @@ class CineViewModel : ViewModel() {
         tamanyoSnack = tamanyo
     }
 
+    fun actualizarSaborBebida(sabor: String) {
+        saborBebida = sabor
+    }
+
+    fun actualizarConHielo(hielo: Boolean) {
+        conHielo = hielo
+    }
+
     fun actualizarCantidad(nuevaCantidad: String) {
         if (nuevaCantidad.all { it.isDigit() }) {
             cantidad = nuevaCantidad
         }
     }
 
-    fun obtenerPrecioUnitario(): Double {
+    fun calcularPrecioUnitario(): Double {
         return if (productoSeleccionado == "Entrada") {
             if (tipoButaca == "Premium") 12.0 else 8.0
-        } else {
+        } else if (productoSeleccionado == "Snack") {
             if (tamanyoSnack == "Pequeño") {
                 3.0
             } else if (tamanyoSnack == "Mediano") {
@@ -78,14 +88,17 @@ class CineViewModel : ViewModel() {
             } else {
                 7.0
             }
+        } else {
+            if (conHielo) 3.0 else 2.5
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun agregarPedido() {
         val cant = cantidad.toIntOrNull()
         if (cant == null || cant <= 0) return
 
-        val precioUnitario = obtenerPrecioUnitario()
+        val precioUnitario = calcularPrecioUnitario()
 
         val productoReal = if (productoSeleccionado == "Entrada") {
             Entrada (
@@ -93,10 +106,16 @@ class CineViewModel : ViewModel() {
                 pelicula = tipoPelicula,
                 butaca = tipoButaca
             )
-        } else {
-            Snack (
+        } else if (productoSeleccionado == "Snack") {
+            Snack(
                 precio = precioUnitario.toString(),
                 tamanyo = tamanyoSnack
+            )
+        } else {
+            Bebida(
+                sabor = saborBebida,
+                conHielo = conHielo,
+                precio = precioUnitario.toString()
             )
         }
 
@@ -109,9 +128,9 @@ class CineViewModel : ViewModel() {
         totalCarrito += precioUnitario * cant
 
         _uiState.update { estadoActual ->
-            val listaActualizada = estadoActual.pedidos.toMutableList()
-            listaActualizada.add(nuevoPedido)
-            estadoActual.copy(pedidos = listaActualizada)
+            estadoActual.copy(
+                pedidos = estadoActual.pedidos + nuevoPedido
+            )
         }
 
         cantidad = ""

@@ -31,18 +31,46 @@ class MateriasViewModel : ViewModel() {
 
     fun actualizarEleccionUrgencia(urgente: Boolean) {
         urgencia = urgente
+        _uiState.update { estadoActual ->
+            estadoActual.copy(
+                tareaUIState = estadoActual.tareaUIState.copy(
+                    esUrgente = urgente
+                )
+            )
+        }
     }
 
     fun actualizarModulo(modulos: String) {
         tipoModulo = modulos
+        _uiState.update { estadoActual ->
+            estadoActual.copy(
+                tareaUIState = estadoActual.tareaUIState.copy(
+                    modulos = modulos
+                )
+            )
+        }
     }
 
     fun actualizarTitulo(titulo: String) {
         tituloUs = titulo
+        _uiState.update { estadoActual ->
+            estadoActual.copy(
+                tareaUIState = estadoActual.tareaUIState.copy(
+                    tituloTarea = titulo
+                )
+            )
+        }
     }
 
     fun actualizarDescripcion(descripcion: String) {
         descripcionUs = descripcion
+        _uiState.update { estadoActual ->
+            estadoActual.copy(
+                tareaUIState = estadoActual.tareaUIState.copy(
+                    descripcion = descripcion
+                )
+            )
+        }
     }
 
 
@@ -59,12 +87,18 @@ class MateriasViewModel : ViewModel() {
             urgencia
         )
 
-        _uiState.update { estadoActual ->
-            val listaTareas = estadoActual.tareas.toMutableList()
-            listaTareas.add(nuevaTarea)
-            estadoActual.copy(
-                tareas = estadoActual.tareas + nuevaTarea
-            )
+        if (urgencia) {
+            _uiState.update { estadoActual ->
+                estadoActual.copy(
+                    tareasUrgentes = estadoActual.tareasUrgentes + nuevaTarea
+                )
+            }
+        } else {
+            _uiState.update { estadoActual ->
+                estadoActual.copy(
+                    tareas = estadoActual.tareas + nuevaTarea
+                )
+            }
         }
 
         tituloUs = ""
@@ -72,6 +106,18 @@ class MateriasViewModel : ViewModel() {
         tipoModulo = ""
         urgencia = false
 
+        _uiState.update { estadoActual ->
+            estadoActual.copy(
+                tareaUIState = estadoActual.tareaUIState.copy(
+                    tituloTarea = "",
+                    descripcion = "",
+                    modulos = "",
+                    esUrgente = false
+                )
+            )
+        }
+
     }
+
 
 }
