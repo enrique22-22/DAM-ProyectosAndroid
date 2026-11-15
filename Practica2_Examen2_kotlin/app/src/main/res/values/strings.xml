@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Practica2_Examen2_kotlin</string>
+    <string name="titulo_anadir">Añadir Persona</string>
+    <string name="label_codigo">Código:</string>
+    <string name="label_nombre">Nombre</string>
+    <string name="label_elige_rol">Elige el rol</string>
+    <string name="rol_alumno">Alumno</string>
+    <string name="rol_profesor">Profesor</string>
+    <string name="label_nia">NIA</string>
+    <string name="label_curso">Curso</string>
+    <string name="curso_primero">Primero</string>
+    <string name="curso_segundo">Segundo</string>
+    <string name="label_tutor">Tutor</string>
+    <string name="btn_anadir">Añadir</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="titulo_lista_alumnos">Alumnos</string>
+    <string name="titulo_lista_profesores">Profesores</string>
+</resources>

@@ -1,0 +1,373 @@
+package com.example.practica2_examen2_kotlin
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.practica2_examen2_kotlin.modelos.Alumno
+import com.example.practica2_examen2_kotlin.modelos.Persona
+import com.example.practica2_examen2_kotlin.modelos.Profesor
+import com.example.practica2_examen2_kotlin.ui.InstitutoViewModel
+
+@Preview(showBackground = true)
+@Composable
+fun PantallaAnadirPersona(
+    modifier: Modifier = Modifier,
+    institutoViewModel: InstitutoViewModel = viewModel()
+) {
+    val uiState by institutoViewModel.uiState.collectAsState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Título
+        Text(
+            text = stringResource(id = R.string.titulo_anadir),
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        // Código generado en tiempo real
+        Text(
+            text = "${stringResource(id = R.string.label_codigo)} ${uiState.codigoGenerado}",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        // Campo Nombre
+        OutlinedTextField(
+            value = uiState.nombre,
+            onValueChange = { institutoViewModel.actualizarNombre(it) },
+            label = { Text(stringResource(id = R.string.label_nombre)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            singleLine = true,
+            modifier = Modifier.width(300.dp)
+        )
+
+        Text(
+            text = stringResource(id = R.string.label_elige_rol),
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Selector de Rol con imagen encima
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.clickable { institutoViewModel.actualizarRol("Alumno") }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = stringResource(id = R.string.rol_alumno),
+                    modifier = Modifier.size(48.dp)
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = uiState.rolSeleccionado == "Alumno",
+                        onClick = { institutoViewModel.actualizarRol("Alumno") }
+                    )
+                    Text(text = stringResource(id = R.string.rol_alumno))
+                }
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.clickable { institutoViewModel.actualizarRol("Profesor") }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = stringResource(id = R.string.rol_profesor),
+                    modifier = Modifier.size(48.dp)
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = uiState.rolSeleccionado == "Profesor",
+                        onClick = { institutoViewModel.actualizarRol("Profesor") }
+                    )
+                    Text(text = stringResource(id = R.string.rol_profesor))
+                }
+            }
+        }
+
+        // Campos dinámicos según el rol
+        if (uiState.rolSeleccionado == "Alumno") {
+            OutlinedTextField(
+                value = uiState.nia,
+                onValueChange = { institutoViewModel.actualizarNia(it) },
+                label = { Text(stringResource(id = R.string.label_nia)) },
+                isError = uiState.niaConError,
+                colors = OutlinedTextFieldDefaults.colors(
+                    errorTextColor = Color.Red,
+                    focusedTextColor = if (uiState.niaConError) Color.Red else MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = if (uiState.niaConError) Color.Red else MaterialTheme.colorScheme.onSurface
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.width(300.dp)
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(text = stringResource(id = R.string.label_curso), fontWeight = FontWeight.Bold)
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { institutoViewModel.actualizarCursoAlumno("Primero") }
+                    ) {
+                        RadioButton(
+                            selected = uiState.cursoAlumno == "Primero",
+                            onClick = { institutoViewModel.actualizarCursoAlumno("Primero") }
+                        )
+                        Text(text = stringResource(id = R.string.curso_primero))
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { institutoViewModel.actualizarCursoAlumno("Segundo") }
+                    ) {
+                        RadioButton(
+                            selected = uiState.cursoAlumno == "Segundo",
+                            onClick = { institutoViewModel.actualizarCursoAlumno("Segundo") }
+                        )
+                        Text(text = stringResource(id = R.string.curso_segundo))
+                    }
+                }
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.label_tutor),
+                    fontWeight = FontWeight.Bold
+                )
+                Switch(
+                    checked = uiState.esTutor,
+                    onCheckedChange = { institutoViewModel.actualizarEsTutor(it) }
+                )
+            }
+
+            // Curso Profesor (Primero arriba y Segundo abajo)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.label_curso),
+                    fontWeight = FontWeight.Bold
+                )
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            institutoViewModel.actualizarImpartePrimero(!uiState.impartePrimero)
+                        }
+                    ) {
+                        Checkbox(
+                            checked = uiState.impartePrimero,
+                            onCheckedChange = { institutoViewModel.actualizarImpartePrimero(it) }
+                        )
+                        Text(text = stringResource(id = R.string.curso_primero))
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            institutoViewModel.actualizarImparteSegundo(!uiState.imparteSegundo)
+                        }
+                    ) {
+                        Checkbox(
+                            checked = uiState.imparteSegundo,
+                            onCheckedChange = { institutoViewModel.actualizarImparteSegundo(it) }
+                        )
+                        Text(text = stringResource(id = R.string.curso_segundo))
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+        // Botones Añadir y Cancelar
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = { institutoViewModel.anadirPersona() }) {
+                Text(text = stringResource(id = R.string.btn_anadir))
+            }
+            Button(onClick = { institutoViewModel.limpiarFormulario() }) {
+                Text(text = stringResource(id = R.string.btn_cancelar))
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+        // --- DOBLE LISTA: ALUMNOS Y PROFESORES ---
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // COLUMNA IZQUIERDA: ALUMNOS
+            Column(modifier = Modifier.weight(0.5f)) {
+                Text(
+                    text = "${stringResource(id = R.string.titulo_lista_alumnos)} (${uiState.listaAlumnos.size})",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(uiState.listaAlumnos) { alumno ->
+                        ItemPersona(persona = alumno)
+                    }
+                }
+            }
+
+            // COLUMNA DERECHA: PROFESORES
+            Column(modifier = Modifier.weight(0.5f)) {
+                Text(
+                    text = "${stringResource(id = R.string.titulo_lista_profesores)} (${uiState.listaProfesores.size})",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(uiState.listaProfesores) { profesor ->
+                        ItemPersona(persona = profesor)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemPersona(persona: Persona) {
+    var abierto by remember { mutableStateOf(false) }
+
+    val colorTarjeta = if (persona is Alumno) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.secondaryContainer
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = colorTarjeta)
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = persona.imagen),
+                    contentDescription = persona.rol,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(end = 6.dp)
+                )
+
+                Column(modifier = Modifier.weight(1f)) {
+                    val nombrePersona = when (persona) {
+                        is Alumno -> persona.nombre
+                        is Profesor -> persona.nombre
+                        else -> ""
+                    }
+                    Text(
+                        text = nombrePersona,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = persona.rol,
+                        fontSize = 12.sp
+                    )
+                }
+
+                IconButton(
+                    onClick = { abierto = !abierto },
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        painter = if (abierto) {
+                            painterResource(R.drawable.ic_launcher_foreground)
+                        } else {
+                            painterResource(R.drawable.ic_launcher_foreground)
+                        },
+                        contentDescription = null
+                    )
+                }
+            }
+
+            if (abierto) {
+                Spacer(modifier = Modifier.height(4.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+
+                when (persona) {
+                    is Alumno -> {
+                        Text(text = "Código: ${persona.codigo}", fontSize = 12.sp)
+                        Text(text = "NIA: ${persona.nia}", fontSize = 12.sp)
+                        Text(text = "Curso: ${persona.curso}", fontSize = 12.sp)
+                    }
+                    is Profesor -> {
+                        val tutorTexto = if (persona.esTutor) "Sí" else "No"
+                        Text(text = "Código: ${persona.codigo}", fontSize = 12.sp)
+                        Text(text = "Tutor: $tutorTexto", fontSize = 12.sp)
+                        Text(text = "Cursos: ${persona.cursos.joinToString(", ")}", fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+    }
+}
